@@ -10,10 +10,23 @@ import UIKit
 
 class MainViewController: UITableViewController {
     
-    let itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    let defaults = UserDefaults.standard
+    let arrayKey = "itemArray"
+    
+    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        if let items = defaults.array(forKey: arrayKey) as? [String] {
+            itemArray = items
+        } else {
+            defaults.set(itemArray, forKey: arrayKey)
+        }
+//        if defaults.array(forKey: arrayKey) == nil {
+//            defaults.set(itemArray, forKey: arrayKey)
+//        } else {
+//            itemArray = defaults.array(forKey: arrayKey) as! [String]
+//        }
         // Do any additional setup after loading the view.
     }
     
@@ -41,5 +54,25 @@ class MainViewController: UITableViewController {
         
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    //MARK: Add New Items
+    
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        var textField = UITextField()
+        let alert = UIAlertController(title: "Add New Item", message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Add Item", style: .default) {(action) in
+            self.itemArray.append(textField.text!)
+            self.defaults.set(self.itemArray, forKey: self.arrayKey)
+            self.tableView.reloadData()
+            print("Success!")
+        }
+        alert.addTextField { alertTextField in
+            textField.placeholder = "Create new item"
+            textField = alertTextField
+        }
+        alert.addAction(action)
+        present(alert, animated: true)
+    }
+    
 }
 
